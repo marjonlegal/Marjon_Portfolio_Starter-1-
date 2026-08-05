@@ -10,9 +10,43 @@ smoothLinks.forEach((link) => {
   });
 });
 
-const revealElements = document.querySelectorAll('.fade-up, .fade-left, .fade-right');
-const observerOptions = { threshold: 0.18 };
+const header = document.querySelector('.site-header');
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = Array.from(document.querySelectorAll('main section[id]'));
 
+const updateHeader = () => {
+  if (header) {
+    header.classList.toggle('is-scrolled', window.scrollY > 12);
+  }
+};
+
+const updateActiveLink = () => {
+  let currentId = 'hero';
+  const offset = window.innerHeight * 0.3;
+
+  sections.forEach((section) => {
+    const top = section.offsetTop - offset;
+    const bottom = top + section.offsetHeight;
+    if (window.scrollY >= top && window.scrollY < bottom) {
+      currentId = section.id;
+    }
+  });
+
+  navLinks.forEach((link) => {
+    const isActive = link.getAttribute('href') === `#${currentId}`;
+    link.classList.toggle('active', isActive);
+  });
+};
+
+window.addEventListener('scroll', () => {
+  updateHeader();
+  updateActiveLink();
+}, { passive: true });
+
+updateHeader();
+updateActiveLink();
+
+const revealElements = document.querySelectorAll('.fade-up, .fade-left, .fade-right');
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
@@ -20,39 +54,46 @@ const revealObserver = new IntersectionObserver((entries) => {
       revealObserver.unobserve(entry.target);
     }
   });
-}, observerOptions);
+}, { threshold: 0.12 });
 
 revealElements.forEach((element) => revealObserver.observe(element));
 
 const counters = document.querySelectorAll('[data-target]');
 
 const animateCounter = (counter) => {
-  const updateValue = () => {
-    const target = +counter.getAttribute('data-target');
-    const current = +counter.innerText;
-    const increment = Math.max(1, Math.floor(target / 60));
+  const target = Number(counter.getAttribute('data-target') || 0);
+  const prefix = counter.getAttribute('data-prefix') || '';
+  const suffix = counter.getAttribute('data-suffix') || '';
+  const duration = 900;
+  const startTime = performance.now();
 
-    if (current < target) {
-      counter.innerText = current + increment;
+  const updateValue = (timestamp) => {
+    const progress = Math.min((timestamp - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const currentValue = Math.round(target * eased);
+
+    counter.textContent = `${prefix}${currentValue}${suffix}`;
+
+    if (progress < 1) {
       requestAnimationFrame(updateValue);
     } else {
-      counter.innerText = target;
+      counter.textContent = `${prefix}${target}${suffix}`;
     }
   };
 
-  updateValue();
+  requestAnimationFrame(updateValue);
 };
-
-const statsObserver = new IntersectionObserver((entries, observer) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      counters.forEach((counter) => animateCounter(counter));
-      observer.disconnect();
-    }
-  });
-}, { threshold: 0.6 });
 
 const statsSection = document.querySelector('#stats');
 if (statsSection) {
+  const statsObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        counters.forEach((counter) => animateCounter(counter));
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.55 });
+
   statsObserver.observe(statsSection);
 }
