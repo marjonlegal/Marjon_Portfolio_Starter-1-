@@ -317,27 +317,39 @@ p {
   justify-items: center;
   gap: 16px;
   padding-top: 12px;
+  align-self: stretch;
 }
 
 .portrait-glow {
   position: absolute;
-  inset: 4% 10% auto 10%;
-  height: 70%;
+  inset: 4% 8% auto 8%;
+  height: 72%;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(37, 99, 235, 0.48), transparent 70%);
-  filter: blur(36px);
+  filter: blur(38px);
   z-index: 0;
 }
 
-.hero-portrait {
+.portrait-frame {
   position: relative;
   z-index: 1;
-  width: min(100%, 430px);
+  width: min(100%, 460px);
+  margin-left: auto;
+  padding: 10px;
+  border-radius: 40px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.2);
+}
+
+.hero-portrait {
+  width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
-  border-radius: 36px;
-  box-shadow: var(--shadow);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  object-position: center top;
+  border-radius: 30px;
+  display: block;
+  background-color: #0b2447;
 }
 
 .hero-side-card {
