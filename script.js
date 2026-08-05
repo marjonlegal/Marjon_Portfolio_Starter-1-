@@ -54,7 +54,7 @@ const revealObserver = new IntersectionObserver((entries) => {
       revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.12 });
+}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
 
 revealElements.forEach((element) => revealObserver.observe(element));
 
